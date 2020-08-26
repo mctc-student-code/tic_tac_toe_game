@@ -4,7 +4,8 @@ Thomas Mullins
 Description: Program will ask the user to enter a sentence, and then return that sentence in camel case
 '''
 
-
+import re
+pattern = re.compile(r'\W')
 sentence = input('Please enter a sentence. Any sentence at all: ')
 wordSplit = sentence.split(' ')
 variableName = ''
@@ -15,6 +16,7 @@ for i in range(len(wordSplit)):
     else:
         variableName += wordSplit[i]
         print(wordSplit[i].capitalize(), end='')
-if '#' in wordSplit or ' ' in wordSplit or '!' in variableName:
+mo = pattern.search(variableName)
+if mo is not None:
     print(f'\nWarning: There may be an issue in created variable name "{variableName}"')
 
