@@ -2,7 +2,7 @@
 import re
 import random
 # regular expression pattern for validation
-pattern = re.compile(r'[1-9]')
+pattern = re.compile(r'\b[1-9]\b')
 # dictionary used for game printing and validation on computer/player turn
 game_square_dict = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
 # used for turn tracking and winner announcement
@@ -11,14 +11,12 @@ used_list = []
 
 # manage game flow and performs exception handling
 def main():
-    try:
-        begin_game()
-        print_board()
-        while True:
-            user_turn()
-            computer_turn()
-    except Exception as err:
-        print(err)
+    begin_game()
+    print_board()
+    while True:
+        user_turn()
+        computer_turn()
+
 
 
 # simple start for the user to see
@@ -27,7 +25,7 @@ def begin_game():
     input('Press enter to begin!')
 
 
-# create and display game board
+# create and display game board, game_square_dict is used for values on the board and updates as moves are made
 def print_board():
     print('{:<1}{:^1}{:<2}{:<1}{:^1}{:<2}{:<1}{:^1}{:<1}'.format('_', f'{game_square_dict[1]}', '_|','_', f'{game_square_dict[2]}', '_|','_', f'{game_square_dict[3]}', '_'))
     print('{:<1}{:^1}{:<2}{:<1}{:^1}{:<2}{:<1}{:^1}{:<1}'.format('_', f'{game_square_dict[4]}', '_|','_', f'{game_square_dict[5]}', '_|','_', f'{game_square_dict[6]}', '_'))
@@ -38,6 +36,7 @@ def print_board():
 def user_turn():
     print('Player Turn!')
     num_selection = input('Choose an unoccupied square: ')
+
     move_validation(number_validation(num_selection))
 
 
@@ -96,7 +95,7 @@ def restart():
 def number_validation(selection):
     mo = pattern.search(str(selection))
     length = len(str(selection))
-    while mo == None or length > 1:
+    while mo == None:
         selection = input("Please enter a single number 1-9 with no spaces: ")
         mo = pattern.search(selection)
     regex = int(selection)
