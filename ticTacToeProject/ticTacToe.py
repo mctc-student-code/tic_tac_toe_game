@@ -8,6 +8,7 @@ game_square_dict = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
 # used for turn tracking and winner announcement
 turn = {'turn':'Player'}
 game_playing = True
+used_list = []
 
 
 def main():
@@ -69,14 +70,24 @@ def win_condition():
         winner()
     elif (game_square_dict[3] == box and game_square_dict[5] == box and game_square_dict[7] == box):
         winner()
+    elif len(used_list) == 9:
+        print("Aaaand It's a tie!")
+        restart()
+
 
 def winner():
     print(f"{turn['turn']} Wins!!!")
+    restart()
+
+
+def restart():
     again = input("Would you like to try again? Enter 'y' or 'n': ")
     while again.lower() != 'y' and again.lower() != 'n':
         again = input("Would you like to try again? Enter 'y' or 'n': ")
     if again == 'y':
         print()
+        for i in range(len(game_square_dict)):
+            game_square_dict[i+1]=i+1
         main()
     else:
         print('Thanks for playing!')
@@ -107,12 +118,14 @@ def move_validation(choice):
         if whosUp == 'Player':
             game_square_dict[choice] = 'X'
             print_board()
+            used_list.append(choice)
             win_condition()
             turn['turn'] = 'Computer'
             print("Computer Turn!")
         elif whosUp == 'Computer':
             game_square_dict[choice] = 'O'
             print_board()
+            used_list.append(choice)
             win_condition()
             turn['turn'] = 'Player'
 
