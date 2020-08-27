@@ -6,7 +6,7 @@ pattern = re.compile(r'[1-9]')
 # dictionary used for game printing and validation on computer/player turn
 game_square_dict = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
 # used for turn tracking and winner announcement
-turn = {'turn':'player'}
+turn = {'turn':'Player'}
 game_playing = True
 
 
@@ -49,7 +49,38 @@ def computer_turn():
 
 
 def win_condition():
-    return
+    if turn['turn'] == 'Player':
+        box = 'X'
+    else:
+        box = 'O'
+    if (game_square_dict[1] == box and game_square_dict[2] == box and game_square_dict[3] == box):
+        winner()
+    elif (game_square_dict[4] == box and game_square_dict[5] == box and game_square_dict[6] == box):
+        winner()
+    elif (game_square_dict[7] == box and game_square_dict[8] == box and game_square_dict[9] == box):
+        winner()
+    elif (game_square_dict[1] == box and game_square_dict[4] == box and game_square_dict[7] == box):
+        winner()
+    elif (game_square_dict[2] == box and game_square_dict[5] == box and game_square_dict[8] == box):
+        winner()
+    elif (game_square_dict[3] == box and game_square_dict[6] == box and game_square_dict[9] == box):
+        winner()
+    elif (game_square_dict[1] == box and game_square_dict[5] == box and game_square_dict[9] == box):
+        winner()
+    elif (game_square_dict[3] == box and game_square_dict[5] == box and game_square_dict[7] == box):
+        winner()
+
+def winner():
+    print(f"{turn['turn']} Wins!!!")
+    again = input("Would you like to try again? Enter 'y' or 'n': ")
+    while again.lower() != 'y' and again.lower() != 'n':
+        again = input("Would you like to try again? Enter 'y' or 'n': ")
+    if again == 'y':
+        print()
+        main()
+    else:
+        print('Thanks for playing!')
+        exit()
 
 
 def number_validation(selection):
@@ -66,22 +97,24 @@ def move_validation(choice):
     mo = pattern.search(str(game_square_dict[choice]))
     whosUp = turn['turn']
     if mo == None:
-        if whosUp == 'player':
+        if whosUp == 'Player':
             print('Not allowed, Choose an empty square')
             print_board()
             user_turn()
-        elif whosUp == 'computer':
+        elif whosUp == 'Computer':
             computer_turn()
     else:
-        if whosUp == 'player':
-            turn['turn'] = 'computer'
+        if whosUp == 'Player':
             game_square_dict[choice] = 'X'
             print_board()
+            win_condition()
+            turn['turn'] = 'Computer'
             print("Computer Turn!")
-        elif whosUp == 'computer':
+        elif whosUp == 'Computer':
             game_square_dict[choice] = 'O'
-            turn['turn'] = 'player'
             print_board()
+            win_condition()
+            turn['turn'] = 'Player'
 
 
 main()
