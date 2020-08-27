@@ -7,19 +7,18 @@ pattern = re.compile(r'[1-9]')
 game_square_dict = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
 # used for turn tracking and winner announcement
 turn = {'turn':'Player'}
-game_playing = True
 used_list = []
 
-
+# manage game flow and performs exception handling
 def main():
-    # try:
+    try:
         begin_game()
         print_board()
-        while game_playing:
+        while True:
             user_turn()
             computer_turn()
-    # except Exception as err:
-    #     print(err)
+    except Exception as err:
+        print(err)
 
 
 # simple start for the user to see
@@ -35,20 +34,19 @@ def print_board():
     print('{:<1}{:^1}{:<2}{:<1}{:^1}{:<2}{:<1}{:^1}{:<1}'.format(' ', f'{game_square_dict[7]}', ' |',' ', f'{game_square_dict[8]}', ' |',' ', f'{game_square_dict[9]}', ' \n'))
 
 
-# ask user for entry during user turn, call for entry validation, call for win condition check
+# ask user for entry during user turn, call for entry validation, call for move validation
 def user_turn():
     print('Player Turn!')
     num_selection = input('Choose an unoccupied square: ')
-    square_choice = number_validation(num_selection)
-    move_validation(square_choice)
+    move_validation(number_validation(num_selection))
 
 
+# same process as user_turn, random.randint used to choose number
 def computer_turn():
-    num_selection = random.randint(1,9)
-    square_choice = number_validation(num_selection)
-    move_validation(square_choice)
+    move_validation(number_validation(random.randint(1,9)))
 
 
+# conditional logic used to check for game winning combinations. When satisfied winner function called if not a draw
 def win_condition():
     if turn['turn'] == 'Player':
         box = 'X'
@@ -74,12 +72,12 @@ def win_condition():
         print("Aaaand It's a tie!")
         restart()
 
-
+# print winner and call restart function
 def winner():
     print(f"{turn['turn']} Wins!!!")
     restart()
 
-
+# ask user if they would like to restart and resets the game board
 def restart():
     again = input("Would you like to try again? Enter 'y' or 'n': ")
     while again.lower() != 'y' and again.lower() != 'n':
@@ -94,6 +92,7 @@ def restart():
         exit()
 
 
+# validation to ensure that only a single number 1-9 is entered
 def number_validation(selection):
     mo = pattern.search(str(selection))
     length = len(str(selection))
@@ -104,6 +103,8 @@ def number_validation(selection):
     return regex
 
 
+# checks game_square_dict if it is a number before allowing new assignment.
+# after each accepted turn the win condition function is called
 def move_validation(choice):
     mo = pattern.search(str(game_square_dict[choice]))
     whosUp = turn['turn']
