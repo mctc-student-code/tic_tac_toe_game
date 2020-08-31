@@ -19,7 +19,8 @@ def main():
     restart()
 
 
-# controls the flow of user and computer turns.
+# controls the flow of user and computer turns. It should be noted that is_win_condition is used to call the
+# turn_controller if no win conditions are met and will only return to main after one of those conditions is triggered
 def turn_controller():
     validated_entry = new_turn()
     add_to_game_board(validated_entry)
