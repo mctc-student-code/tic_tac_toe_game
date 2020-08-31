@@ -7,16 +7,19 @@ pattern = re.compile(r'\b[1-9]\b')
 game_square_dict = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
 # used for turn tracking and winner announcement
 turn = 'Player'
-used_list = []
+turn_count = 0
 
-# manage game flow and performs exception handling
+# overarching controller. Responsible for beginning the game, starting the turn_controller, and restarting the program
+# when turn controller function completes
 def main():
     begin_game()
     print_board()
     turn_controller()
+    winner()
     restart()
 
 
+# controls the flow of user and computer turns.
 def turn_controller():
     validated_entry = new_turn()
     add_to_game_board(validated_entry)
@@ -29,26 +32,69 @@ def begin_game():
     input('Press enter to begin!')
 
 
-# create and display game board, game_square_dict is used for values on the board and updates as moves are made
+# game board print statements use hard coded patterns for the layout. game_square dictionary is initially populated
+# with numbers 1-9 and replaced by either "X" or "O" in the add_to_game_board function after numbers are selected and validated
 def print_board():
-    print('{:<1}{:^1}{:<2}{:<1}{:^1}{:<2}{:<1}{:^1}{:<1}'.format('_', f'{game_square_dict[1]}', '_|','_', f'{game_square_dict[2]}', '_|','_', f'{game_square_dict[3]}', '_'))
+    print('{:<1}{:^1}{:<2}{:<1}{:^1}{:<2}{:<1}{:^1}{:<1}'.format('_', f'{game_square_dict[1]}', '_|','_',f'{game_square_dict[2]}', '_|','_', f'{game_square_dict[3]}', '_'))
     print('{:<1}{:^1}{:<2}{:<1}{:^1}{:<2}{:<1}{:^1}{:<1}'.format('_', f'{game_square_dict[4]}', '_|','_', f'{game_square_dict[5]}', '_|','_', f'{game_square_dict[6]}', '_'))
     print('{:<1}{:^1}{:<2}{:<1}{:^1}{:<2}{:<1}{:^1}{:<1}'.format(' ', f'{game_square_dict[7]}', ' |',' ', f'{game_square_dict[8]}', ' |',' ', f'{game_square_dict[9]}', ' \n'))
 
 
-# ask user for entry during user turn, call for entry validation, call for move validation
-#TODO combine user_turn and computer turn using if/else to decide between routes. Return validated number
+# conditional logic is used to check which turn the game is on. If 'Player' is currently in the turn variable an
+# input prompt will be used asking the player to select a number. If 'Computer' is currently stored in turn the
+# random.randint function from the random library is used to choose a number 1-9. In either instance the number
+# selected will be passed through the number_validation follwed by the move_validation functions before being
+# returned to the turn controller.
 def new_turn():
     global turn
     if turn == 'Player':
-        print('Player Turn!')
-        num_selection = input('Choose an unoccupied square: ')
-        valid_number = move_validation(number_validation(num_selection))
-        return valid_number
+        num_selection = input('Choose a square (1-9): ')
+        return move_validation(number_validation(num_selection))
     else:
-        print('Computer Turn!')
-        valid_number = move_validation(number_validation(random.randint(1, 9)))
-        return valid_number
+        return move_validation(number_validation(random.randint(1, 9)))
+
+
+# regular expression is used to ensure that the only allowed entry is numeric between 1-9. Conversion to string is
+# required for pattern matching. if no pattern is found the user is asked to submit a new entry until a match is found.
+# When match condition is met the value is returned to turn_controller.
+def number_validation(selection):
+    mo = pattern.search(str(selection))
+    while mo is None:
+        selection = input("Please enter a single number 1-9 with no spaces: ")
+        mo = pattern.search(selection)
+    number_fixed = int(selection)
+    return number_fixed
+
+
+
+def move_validation(choice):
+    global turn
+    global turn_count
+    mo = pattern.search(str(game_square_dict[choice]))
+    if mo is None:
+        if turn == 'Player':
+            print('Not allowed, Choose an empty square')
+            print_board()
+            turn_controller()
+        elif turn == 'Computer':
+            turn_controller()
+    else:
+        if turn == 'Player':
+            turn_count += 1
+            return choice
+        elif turn == 'Computer':
+            turn_count += 1
+            return choice
+
+
+def add_to_game_board(entry):
+    global turn
+    if turn == 'Player':
+        game_square_dict[entry] = 'X'
+        print_board()
+    elif turn == 'Computer':
+        game_square_dict[entry] = 'O'
+        print_board()
 
 
 # conditional logic used to check for game winning combinations. When satisfied winner function called if not a draw
@@ -59,31 +105,26 @@ def is_win_condition():
         box = 'X'
     else:
         box = 'O'
-    if (game_square_dict[1] == box and game_square_dict[2] == box and game_square_dict[3] == box):
-        winner()
-    elif (game_square_dict[4] == box and game_square_dict[5] == box and game_square_dict[6] == box):
-        winner()
-    elif (game_square_dict[7] == box and game_square_dict[8] == box and game_square_dict[9] == box):
-        winner()
-    elif (game_square_dict[1] == box and game_square_dict[4] == box and game_square_dict[7] == box):
-        winner()
-    elif (game_square_dict[2] == box and game_square_dict[5] == box and game_square_dict[8] == box):
-        winner()
-    elif (game_square_dict[3] == box and game_square_dict[6] == box and game_square_dict[9] == box):
-        winner()
-    elif (game_square_dict[1] == box and game_square_dict[5] == box and game_square_dict[9] == box):
-        winner()
-    elif (game_square_dict[3] == box and game_square_dict[5] == box and game_square_dict[7] == box):
-        winner()
-    elif len(used_list) == 9:
+    if (game_square_dict[1] == box and game_square_dict[2] == box and game_square_dict[3] == box) or \
+            (game_square_dict[4] == box and game_square_dict[5] == box and game_square_dict[6] == box) or \
+            (game_square_dict[7] == box and game_square_dict[8] == box and game_square_dict[9] == box) or \
+            (game_square_dict[1] == box and game_square_dict[4] == box and game_square_dict[7] == box) or \
+            (game_square_dict[2] == box and game_square_dict[5] == box and game_square_dict[8] == box) or \
+            (game_square_dict[3] == box and game_square_dict[6] == box and game_square_dict[9] == box) or \
+            (game_square_dict[1] == box and game_square_dict[5] == box and game_square_dict[9] == box) or \
+            (game_square_dict[3] == box and game_square_dict[5] == box and game_square_dict[7] == box):
+        return
+    elif turn_count == 9:
         print("Aaaand It's a tie!")
         # restart()
     else:
         if turn == 'Player':
             turn = 'Computer'
+            print(f'{turn} turn')
             turn_controller()
         else:
             turn = 'Player'
+            print(f'{turn} turn')
             turn_controller()
 
 
@@ -107,46 +148,5 @@ def restart():
         exit()
 
 
-# validation to ensure that only a single number 1-9 is entered
-def number_validation(selection):
-    mo = pattern.search(str(selection))
-    while mo == None:
-        selection = input("Please enter a single number 1-9 with no spaces: ")
-        mo = pattern.search(selection)
-    regex = int(selection)
-    return regex
-
-
-# checks game_square_dict if it is a number before allowing new assignment.
-# after each accepted turn the win condition function is called
-#TODO will use same basic format but will no longer be responsible for turn change or assignment to game_board
-#TODO must return validated assignment
-def move_validation(choice):
-    global turn
-    mo = pattern.search(str(game_square_dict[choice]))
-    if mo == None:
-        if turn == 'Player':
-            print('Not allowed, Choose an empty square')
-            print_board()
-            new_turn()
-        elif turn == 'Computer':
-            new_turn()
-    else:
-        if turn == 'Player':
-            used_list.append(choice)
-            return choice
-        elif turn == 'Computer':
-            used_list.append(choice)
-            return choice
-
-
-def add_to_game_board(entry):
-    global turn
-    if turn == 'Player':
-        game_square_dict[entry] = 'X'
-        print_board()
-    elif turn == 'Computer':
-        game_square_dict[entry] = 'O'
-        print_board()
 
 main()
