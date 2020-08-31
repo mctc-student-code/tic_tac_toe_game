@@ -6,9 +6,9 @@ pattern = re.compile(r'\b[1-9]\b')
 # dictionary used for game printing and validation on computer/player turn
 game_square_dict = {1:1, 2:2, 3:3, 4:4, 5:5, 6:6, 7:7, 8:8, 9:9}
 # used for turn tracking and winner announcement
-turn = {'turn':'Player'}
+turn = 'Player'
 used_list = []
-player = 'Player'
+
 # manage game flow and performs exception handling
 def main():
     begin_game()
@@ -39,13 +39,14 @@ def print_board():
 # ask user for entry during user turn, call for entry validation, call for move validation
 #TODO combine user_turn and computer turn using if/else to decide between routes. Return validated number
 def new_turn():
-
-    if turn['turn'] == 'Player':
+    global turn
+    if turn == 'Player':
         print('Player Turn!')
         num_selection = input('Choose an unoccupied square: ')
         valid_number = move_validation(number_validation(num_selection))
         return valid_number
     else:
+        print('Computer Turn!')
         valid_number = move_validation(number_validation(random.randint(1, 9)))
         return valid_number
 
@@ -53,8 +54,8 @@ def new_turn():
 # conditional logic used to check for game winning combinations. When satisfied winner function called if not a draw
 #TODO add else to call for user/computer turn method if no other conditions are met
 def is_win_condition():
-
-    if turn['turn'] == 'Player':
+    global turn
+    if turn == 'Player':
         box = 'X'
     else:
         box = 'O'
@@ -78,18 +79,17 @@ def is_win_condition():
         print("Aaaand It's a tie!")
         # restart()
     else:
-        if turn['turn'] == 'Player':
-            turn['turn'] = 'Computer'
+        if turn == 'Player':
+            turn = 'Computer'
             turn_controller()
         else:
-            player = 'Player'
-            turn['turn'] = 'Player'
+            turn = 'Player'
             turn_controller()
 
 
 # print winner and call restart function
 def winner():
-    print(f"{turn['turn']} Wins!!!")
+    print(f"{turn} Wins!!!")
     restart()
 
 # ask user if they would like to restart and resets the game board
@@ -122,30 +122,30 @@ def number_validation(selection):
 #TODO will use same basic format but will no longer be responsible for turn change or assignment to game_board
 #TODO must return validated assignment
 def move_validation(choice):
+    global turn
     mo = pattern.search(str(game_square_dict[choice]))
-    whosUp = turn['turn']
     if mo == None:
-        if whosUp == 'Player':
+        if turn == 'Player':
             print('Not allowed, Choose an empty square')
             print_board()
             new_turn()
-        elif whosUp == 'Computer':
+        elif turn == 'Computer':
             new_turn()
     else:
-        if whosUp == 'Player':
+        if turn == 'Player':
             used_list.append(choice)
             return choice
-        elif whosUp == 'Computer':
+        elif turn == 'Computer':
             used_list.append(choice)
             return choice
 
 
 def add_to_game_board(entry):
-    whosUp = turn['turn']
-    if whosUp == 'Player':
+    global turn
+    if turn == 'Player':
         game_square_dict[entry] = 'X'
         print_board()
-    elif whosUp == 'Computer':
+    elif turn == 'Computer':
         game_square_dict[entry] = 'O'
         print_board()
 
