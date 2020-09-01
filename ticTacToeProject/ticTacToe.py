@@ -28,7 +28,6 @@ def main():
 # re-entry.
 def turn_controller():
     while True:
-        # new_entry = new_turn()
         validated_entry = move_validation(number_validation(new_turn()))
         while validated_entry is False:
             validated_entry = move_validation(number_validation(new_turn()))
@@ -97,7 +96,6 @@ def move_validation(choice):
     value = str(game_square_dict[choice])
     if value.isnumeric() is False:
         if turn == 'Player':
-            # print('Not allowed, Choose an empty square')
             return False
         elif turn == 'Computer':
             return False
