@@ -1,5 +1,3 @@
-#TODO rewrite all comments
-#TODO Consider combining main and Turn controller
 
 import re
 import random
@@ -25,7 +23,9 @@ def main():
             break
 
 
-# uses first while true loop to continue game until is_win_condition returns true. If validation fails in the move
+# uses first while true loop to continue game until is_win_condition returns a boolean value.  Inner while loop is
+# used so that Should move_validator() returns false the program will begin again to ensure number validation in the
+# re-entry.
 def turn_controller():
     while True:
         # new_entry = new_turn()
@@ -62,22 +62,18 @@ def print_board():
 # conditional logic is used to check which turn the game is on. If 'Player' is currently in the turn variable an
 # input prompt will be used asking the player to select a number. If 'Computer' is currently stored in turn the
 # random.randint function from the random library is used to choose a number 1-9. In either instance the number
-# selected will be passed through the number_validation follwed by the move_validation functions before being
+# selected will be passed through the number_validation followed by the move_validation functions before being
 # returned to the turn controller.
 def new_turn():
     global turn
     if turn == 'Player':
         return input('Please choose an unoccupied square (1-9): ')
-
-        # num_selection = input('Choose a square (1-9): ')
-        # return move_validation(number_validation(num_selection))
     else:
         return random.randint(1,9)
-        # return move_validation(number_validation(random.randint(1, 9)))
 
 
-# regular expression is used to ensure that the only allowed entry is numeric between 1-9. Conversion to string is
-# required for pattern matching. if no pattern is found the user is asked to submit a new entry until a match is found.
+# regular expression is used to ensure that the only allowed entry is numeric between 1-9.
+# if no pattern is found the user is asked to submit a new entry until a match is found.
 # When match condition is met the value is returned to turn_controller.
 def number_validation(selection):
     pattern = re.compile(r'\b[1-9]\b')
@@ -89,11 +85,12 @@ def number_validation(selection):
     return number_fixed
 
 
-# Used overall to check if the player/computer input has already been selected. This is done by checking if the choice
-# parameter matches the game_square_dict dictionary's default value when also used as it's key. If the dictionary key
-# has already been selected its value will represent either an 'X' or an 'O' and no match will be returned from the
-# regular expression. if no pattern is found the user will be returned to the turn_controller to try again.
-# If the choice parameter passes it is returned to the turn_controller and the turn counter is increased by 1
+# Used overall to check if the player/computer input has already been used in the game_square_dict. This is done by
+# checking if the choice parameter matches the game_square_dict dictionary's default value when also used as it's
+# key. If the dictionary key has already been selected its value will represent either an 'X' or an 'O' and no match
+# will be returned from the regular expression. if no pattern is found the user will be returned to the
+# turn_controller to try again. If the choice parameter passes it is returned to the turn_controller and the turn
+# counter is increased by 1
 def move_validation(choice):
     global turn
     global turn_count
@@ -113,17 +110,14 @@ def move_validation(choice):
             return choice
 
 
-
 # entry parameter is used as the key to access an item in the game_square_dict dictionary. Dependant on value of turn,
 # either an 'X' or 'O' will be assigned as the new value in the dictionary.
 def add_to_game_board(entry):
     global turn
     if turn == 'Player':
         game_square_dict[entry] = 'X'
-        # print_board()
     elif turn == 'Computer':
         game_square_dict[entry] = 'O'
-        # print_board()
 
 
 # turn variable is used to determine what value the conditional is looking for. Should any of the conditions be satisfied
@@ -151,14 +145,12 @@ def is_win_condition():
         if turn == 'Player':
             turn = 'Computer'
             print(f'{turn} turn')
-            # turn_controller()
         else:
             turn = 'Player'
             print(f'{turn} turn')
-            # turn_controller()
 
 
-# game_winner parameter to announce winner if game_draw is equal to False. Alternatively, a draw announcement is printed
+# game_win parameter to announce winner if game_win is True. Alternatively, a draw announcement is printed
 def winner(game_win):
     if game_win:
         print(f"{turn} Wins!!!")
