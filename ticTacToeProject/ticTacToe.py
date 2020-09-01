@@ -13,10 +13,11 @@ playing_game = True
 
 
 # overarching controller. While loop is used for restart purposes and will loop through function calls until False is
-# returned from the restart function. Else break is used to end the loop and program normally.
+# returned from the restart function. Else, break is used to end the loop and program normally.
 def main():
     begin_game()
     while playing_game:
+        print_board()
         game_winner = turn_controller()
         winner(game_winner)
         play_again = restart()
@@ -24,18 +25,17 @@ def main():
             break
 
 
-
+# uses first while true loop to continue game until is_win_condition returns true. If validation fails in the move
 def turn_controller():
     while True:
         # new_entry = new_turn()
-        validated_entry = move_validation(number_validation(new_turn(message='Choose a square: ')))
+        validated_entry = move_validation(number_validation(new_turn()))
         while validated_entry is False:
-            validated_entry = move_validation(number_validation(new_turn(message = 'Square occupied. Please choose an '
-                                                                                   'empty square: ')))
+            validated_entry = move_validation(number_validation(new_turn()))
         add_to_game_board(validated_entry)
+        print_board()
         if is_win_condition():
             return is_win_condition()
-
 
 
 # simple start for the user to see
@@ -64,11 +64,10 @@ def print_board():
 # random.randint function from the random library is used to choose a number 1-9. In either instance the number
 # selected will be passed through the number_validation follwed by the move_validation functions before being
 # returned to the turn controller.
-def new_turn(message):
+def new_turn():
     global turn
-    print_board()
     if turn == 'Player':
-        return input(message)
+        return input('Please choose an unoccupied square (1-9): ')
 
         # num_selection = input('Choose a square (1-9): ')
         # return move_validation(number_validation(num_selection))
@@ -112,6 +111,7 @@ def move_validation(choice):
         elif turn == 'Computer':
             turn_count += 1
             return choice
+
 
 
 # entry parameter is used as the key to access an item in the game_square_dict dictionary. Dependant on value of turn,
