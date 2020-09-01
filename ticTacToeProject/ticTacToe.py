@@ -4,8 +4,6 @@
 import re
 import random
 
-# regular expression pattern for validation
-pattern = re.compile(r'\b[1-9]\b')
 # dictionary used for game printing and validation on computer/player turn
 game_square_dict = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9}
 # used for turn tracking and winner announcement
@@ -14,8 +12,8 @@ turn_count = 0
 playing_game = True
 
 
-# overarching controller. Responsible for beginning the game, starting the turn_controller, and restarting the program
-# when turn controller function completes
+# overarching controller. While loop is used for restart purposes and will loop through function calls until False is
+# returned from the restart function. Else break is used to end the loop and program normally.
 def main():
     begin_game()
     while playing_game:
@@ -27,14 +25,13 @@ def main():
 
 
 
-# controls the flow of user and computer turns. It should be noted that is_win_condition is used to call the
-# turn_controller if no win conditions are met and will only return to main after one of those conditions is triggered
 def turn_controller():
     while True:
-        new_entry = new_turn()
-        validated_entry = move_validation(number_validation(new_entry))
-        while str(validated_entry).isnumeric() is False:
-            validated_entry = move_validation(number_validation(new_entry))
+        # new_entry = new_turn()
+        validated_entry = move_validation(number_validation(new_turn(message='Choose a square: ')))
+        while validated_entry is False:
+            validated_entry = move_validation(number_validation(new_turn(message = 'Square occupied. Please choose an '
+                                                                                   'empty square: ')))
         add_to_game_board(validated_entry)
         if is_win_condition():
             return is_win_condition()
@@ -67,11 +64,11 @@ def print_board():
 # random.randint function from the random library is used to choose a number 1-9. In either instance the number
 # selected will be passed through the number_validation follwed by the move_validation functions before being
 # returned to the turn controller.
-def new_turn():
+def new_turn(message):
     global turn
     print_board()
     if turn == 'Player':
-        return input('Choose a square (1-9): ')
+        return input(message)
 
         # num_selection = input('Choose a square (1-9): ')
         # return move_validation(number_validation(num_selection))
@@ -84,6 +81,7 @@ def new_turn():
 # required for pattern matching. if no pattern is found the user is asked to submit a new entry until a match is found.
 # When match condition is met the value is returned to turn_controller.
 def number_validation(selection):
+    pattern = re.compile(r'\b[1-9]\b')
     mo = pattern.search(str(selection))
     while mo is None:
         selection = input("Please enter a single number 1-9 with no spaces: ")
@@ -103,7 +101,7 @@ def move_validation(choice):
     value = str(game_square_dict[choice])
     if value.isnumeric() is False:
         if turn == 'Player':
-            print('Not allowed, Choose an empty square')
+            # print('Not allowed, Choose an empty square')
             return False
         elif turn == 'Computer':
             return False
