@@ -1,3 +1,6 @@
+#TODO rewrite all comments
+#TODO Consider combining main and Turn controller
+
 import re
 import random
 
@@ -8,23 +11,34 @@ game_square_dict = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9}
 # used for turn tracking and winner announcement
 turn = 'Player'
 turn_count = 0
+playing_game = True
 
 
 # overarching controller. Responsible for beginning the game, starting the turn_controller, and restarting the program
 # when turn controller function completes
 def main():
     begin_game()
-    game_winner = turn_controller()
-    winner(game_winner)
-    restart()
+    while playing_game:
+        game_winner = turn_controller()
+        winner(game_winner)
+        play_again = restart()
+        if play_again is False:
+            break
+
 
 
 # controls the flow of user and computer turns. It should be noted that is_win_condition is used to call the
 # turn_controller if no win conditions are met and will only return to main after one of those conditions is triggered
 def turn_controller():
-    validated_entry = new_turn()
-    add_to_game_board(validated_entry)
-    return is_win_condition()
+    while True:
+        new_entry = new_turn()
+        validated_entry = move_validation(number_validation(new_entry))
+        while str(validated_entry).isnumeric() is False:
+            validated_entry = move_validation(number_validation(new_entry))
+        add_to_game_board(validated_entry)
+        if is_win_condition():
+            return is_win_condition()
+
 
 
 # simple start for the user to see
@@ -34,7 +48,8 @@ def begin_game():
 
 
 # game board print statements use hard coded patterns for the layout. game_square dictionary is initially populated
-# with numbers 1-9 and replaced by either "X" or "O" in the add_to_game_board function after numbers are selected and validated
+# with numbers 1-9 and replaced by either "X" or "O" in the add_to_game_board function after numbers are selected and
+# validated
 def print_board():
     print('{:<1}{:^1}{:<2}{:<1}{:^1}{:<2}{:<1}{:^1}{:<1}'.format('_', f'{game_square_dict[1]}', '_|', '_',
                                                                  f'{game_square_dict[2]}', '_|', '_',
@@ -56,10 +71,13 @@ def new_turn():
     global turn
     print_board()
     if turn == 'Player':
-        num_selection = input('Choose a square (1-9): ')
-        return move_validation(number_validation(num_selection))
+        return input('Choose a square (1-9): ')
+
+        # num_selection = input('Choose a square (1-9): ')
+        # return move_validation(number_validation(num_selection))
     else:
-        return move_validation(number_validation(random.randint(1, 9)))
+        return random.randint(1,9)
+        # return move_validation(number_validation(random.randint(1, 9)))
 
 
 # regular expression is used to ensure that the only allowed entry is numeric between 1-9. Conversion to string is
@@ -82,14 +100,13 @@ def number_validation(selection):
 def move_validation(choice):
     global turn
     global turn_count
-    mo = pattern.search(str(game_square_dict[choice]))
-    if mo is None:
+    value = str(game_square_dict[choice])
+    if value.isnumeric() is False:
         if turn == 'Player':
             print('Not allowed, Choose an empty square')
-            print_board()
-            turn_controller()
+            return False
         elif turn == 'Computer':
-            turn_controller()
+            return False
     else:
         if turn == 'Player':
             turn_count += 1
@@ -105,10 +122,10 @@ def add_to_game_board(entry):
     global turn
     if turn == 'Player':
         game_square_dict[entry] = 'X'
-        print_board()
+        # print_board()
     elif turn == 'Computer':
         game_square_dict[entry] = 'O'
-        print_board()
+        # print_board()
 
 
 # turn variable is used to determine what value the conditional is looking for. Should any of the conditions be satisfied
@@ -136,16 +153,16 @@ def is_win_condition():
         if turn == 'Player':
             turn = 'Computer'
             print(f'{turn} turn')
-            turn_controller()
+            # turn_controller()
         else:
             turn = 'Player'
             print(f'{turn} turn')
-            turn_controller()
+            # turn_controller()
 
 
 # game_winner parameter to announce winner if game_draw is equal to False. Alternatively, a draw announcement is printed
-def winner(game_draw):
-    if not game_draw:
+def winner(game_win):
+    if game_win:
         print(f"{turn} Wins!!!")
     else:
         print('It\'s a Draw!')
@@ -164,10 +181,10 @@ def restart():
         for i in range(len(game_square_dict)):
             game_square_dict[i + 1] = i + 1
         turn_count = 0
-        turn_controller()
-
+        return True
     else:
         print('Thanks for playing!')
+        return False
 
 
 main()
