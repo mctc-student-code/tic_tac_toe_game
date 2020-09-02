@@ -22,15 +22,13 @@ def main():
         if play_again is False:
             break
 
-
+#TODO rewrite
 # uses first while true loop to continue game until is_win_condition returns a boolean value.  Inner while loop is
 # used so that Should move_validator() returns false the program will begin again to ensure number validation in the
 # re-entry.
 def turn_controller():
     while True:
-        validated_entry = move_validation(number_validation(new_turn()))
-        while validated_entry is False:
-            validated_entry = move_validation(number_validation(new_turn()))
+        validated_entry = number_validation(new_turn())
         add_to_game_board(validated_entry)
         print_board()
         if is_win_condition():
@@ -70,42 +68,25 @@ def new_turn():
     else:
         return random.randint(1,9)
 
-
-# regular expression is used to ensure that the only allowed entry is numeric between 1-9.
-# if no pattern is found the user is asked to submit a new entry until a match is found.
-# When match condition is met the value is returned to turn_controller.
+#TODO rewrite following comments
 def number_validation(selection):
-    pattern = re.compile(r'\b[1-9]\b')
-    mo = pattern.search(str(selection))
-    while mo is None:
-        selection = input("Please enter a single number 1-9 with no spaces: ")
-        mo = pattern.search(selection)
-    number_fixed = int(selection)
-    return number_fixed
-
-
-# Used overall to check if the player/computer input has already been used in the game_square_dict. This is done by
-# checking if the choice parameter matches the game_square_dict dictionary's default value when also used as it's
-# key. If the dictionary key has already been selected its value will represent either an 'X' or an 'O' and no match
-# will be returned from the regular expression. if no pattern is found the user will be returned to the
-# turn_controller to try again. If the choice parameter passes it is returned to the turn_controller and the turn
-# counter is increased by 1
-def move_validation(choice):
     global turn
     global turn_count
-    value = str(game_square_dict[choice])
-    if value.isnumeric() is False:
-        if turn == 'Player':
-            return False
-        elif turn == 'Computer':
-            return False
-    else:
-        if turn == 'Player':
-            turn_count += 1
-            return choice
-        elif turn == 'Computer':
-            turn_count += 1
-            return choice
+    pattern = re.compile(r'\b[1-9]\b')
+    mo = pattern.search(str(selection))
+    while mo is None or str(game_square_dict[int(selection)]).isnumeric() is False:
+        if turn == "Player":
+            selection = input("Not allowed. Please choose an unoccupied square: ")
+            mo = pattern.search(selection)
+        else:
+            selection = random.randint(1,9)
+    number_fixed = int(selection)
+    if turn == 'Player':
+        turn_count += 1
+        return number_fixed
+    elif turn == 'Computer':
+        turn_count += 1
+        return number_fixed
 
 
 # entry parameter is used as the key to access an item in the game_square_dict dictionary. Dependant on value of turn,
