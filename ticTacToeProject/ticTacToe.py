@@ -22,20 +22,19 @@ def main():
         if play_again is False:
             break
 
-#TODO rewrite
-# uses first while true loop to continue game until is_win_condition returns a boolean value.  Inner while loop is
-# used so that Should move_validator() returns false the program will begin again to ensure number validation in the
-# re-entry.
+
+# while loop is used to allow the program to continue until is_win_condition is returned as true. turn_controller
+# is responsible for the overall game running. Includes calls to functions that ask the user/computer for an input,
+# validate that entry, and add validated entry to the game board.
 def turn_controller():
     while True:
-        validated_entry = number_validation(new_turn())
-        add_to_game_board(validated_entry)
+        add_to_game_board(number_validation(new_turn()))
         print_board()
         if is_win_condition():
             return is_win_condition()
 
 
-# simple start for the user to see
+# simple start for the user to see. In future iterations a 2 player option will go here.
 def begin_game():
     print('Welcome to Tic-Tac-Toe!')
     input('Press enter to begin!')
@@ -62,18 +61,19 @@ def print_board():
 # selected will be passed through the number_validation followed by the move_validation functions before being
 # returned to the turn controller.
 def new_turn():
-    global turn
     if turn == 'Player':
         return input('Please choose an unoccupied square (1-9): ')
     else:
         return random.randint(1,9)
 
-#TODO rewrite following comments
+
+# Function is used to validate the parameter for datatype, allowed range, and if the selected number has not been used
 def number_validation(selection):
-    global turn
     global turn_count
     pattern = re.compile(r'\b[1-9]\b')
     mo = pattern.search(str(selection))
+    # loop will continue if no match was found from .search(), or if selection when used as a key in game_square_dict
+    # returns a non-numeric value
     while mo is None or str(game_square_dict[int(selection)]).isnumeric() is False:
         if turn == "Player":
             selection = input("Not allowed. Please choose an unoccupied square: ")
@@ -81,6 +81,8 @@ def number_validation(selection):
         else:
             selection = random.randint(1,9)
     number_fixed = int(selection)
+    # if conditions are satisfied, turn counter is advanced by 1 and the turn variable switches to the other player
+    # and the users selected number is returned to the turn_controller() to be added to the game board.
     if turn == 'Player':
         turn_count += 1
         return number_fixed
@@ -92,7 +94,6 @@ def number_validation(selection):
 # entry parameter is used as the key to access an item in the game_square_dict dictionary. Dependant on value of turn,
 # either an 'X' or 'O' will be assigned as the new value in the dictionary.
 def add_to_game_board(entry):
-    global turn
     if turn == 'Player':
         game_square_dict[entry] = 'X'
     elif turn == 'Computer':
