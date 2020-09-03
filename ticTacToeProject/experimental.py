@@ -10,6 +10,7 @@ turn_count = 0
 playing_game = True
 
 
+
 # overarching controller. While loop is used for restart purposes and will loop through function calls until False is
 # returned from the restart function. Else, break is used to end the loop and program normally.
 def main():
@@ -28,9 +29,9 @@ def main():
 # re-entry.
 def turn_controller():
     while True:
-        validated_entry = number_validation(new_turn())
-        # while validated_entry is False:
-        #     validated_entry = move_validation(number_validation(new_turn()))
+        validated_entry = move_validation(number_validation(new_turn()))
+        while validated_entry is False:
+            validated_entry = move_validation(number_validation(new_turn()))
         add_to_game_board(validated_entry)
         print_board()
         if is_win_condition():
@@ -74,32 +75,32 @@ def new_turn():
 # regular expression is used to ensure that the only allowed entry is numeric between 1-9.
 # if no pattern is found the user is asked to submit a new entry until a match is found.
 # When match condition is met the value is returned to turn_controller.
-# def number_validation(selection):
-#     pattern = re.compile(r'\b[1-9]\b')
-#     mo = pattern.search(str(selection))
-#     while mo is None:
-#         selection = input("Please enter a single number 1-9 with no spaces: ")
-#         mo = pattern.search(selection)
-#     number_fixed = int(selection)
-#     return number_fixed
 def number_validation(selection):
-    global turn
-    global turn_count
     pattern = re.compile(r'\b[1-9]\b')
     mo = pattern.search(str(selection))
-    while mo is None or str(game_square_dict[int(selection)]).isnumeric() is False:
-        if turn == "Player":
-            selection = input("Not allowed. Please choose an unoccupied square: ")
-            mo = pattern.search(selection)
-        else:
-            selection = random.randint(1,9)
+    while mo is None:
+        selection = input("Please enter a single number 1-9 with no spaces: ")
+        mo = pattern.search(selection)
     number_fixed = int(selection)
-    if turn == 'Player':
-        turn_count += 1
-        return number_fixed
-    elif turn == 'Computer':
-        turn_count += 1
-        return number_fixed
+    return number_fixed
+# def number_validation(selection):
+#     global turn
+#     global turn_count
+#     pattern = re.compile(r'\b[1-9]\b')
+#     mo = pattern.search(str(selection))
+#     while mo is None or str(game_square_dict[int(selection)]).isnumeric() is False:
+#         if turn == "Player":
+#             selection = input("Not allowed. Please choose an unoccupied square: ")
+#             mo = pattern.search(selection)
+#         else:
+#             selection = random.randint(1,9)
+#     number_fixed = int(selection)
+#     if turn == 'Player':
+#         turn_count += 1
+#         return number_fixed
+#     elif turn == 'Computer':
+#         turn_count += 1
+#         return number_fixed
 
 
 # Used overall to check if the player/computer input has already been used in the game_square_dict. This is done by
