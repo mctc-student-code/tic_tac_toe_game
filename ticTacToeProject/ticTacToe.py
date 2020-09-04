@@ -70,29 +70,6 @@ def new_turn():
         return random.randint(1,9)
 
 
-# Function is used to validate the parameter for datatype, allowed range, and if the selected number has not been used
-# def number_validation(selection):
-#     global turn_count
-#     pattern = re.compile(r'\b[1-9]\b')
-#     mo = pattern.search(str(selection))
-#     # loop will continue if no match was found from .search(), or if selection when used as a key in game_square_dict
-#     # returns a non-numeric value
-#     while mo is None or str(game_square_dict[int(selection)]).isnumeric() is False:
-#         if turn == "Player":
-#             selection = input("Not allowed. Please choose an unoccupied square: ")
-#             mo = pattern.search(selection)
-#         else:
-#             selection = random.randint(1,9)
-#     number_fixed = int(selection)
-#     # if conditions are satisfied, turn counter is advanced by 1 and the turn variable switches to the other player
-#     # and the users selected number is returned to the turn_controller() to be added to the game board.
-#     if turn == 'Player':
-#         turn_count += 1
-#         return number_fixed
-#     elif turn == 'Computer':
-#         turn_count += 1
-#         return number_fixed
-
 # regular expression is used to ensure that the only allowed entry is numeric between 1-9.
 # if no pattern is found the user is asked to submit a new entry until a match is found.
 # When match condition is met the value is returned to turn_controller.
