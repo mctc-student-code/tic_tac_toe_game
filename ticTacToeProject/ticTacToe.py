@@ -16,10 +16,10 @@ def main():
     begin_game()
     while playing_game:
         print_board()
-        game_winner = turn_controller()
-        winner(game_winner)
-        play_again = restart()
-        if play_again is False:
+        winner(turn_controller())
+        if restart():
+            clear_board()
+        else:
             break
 
 
@@ -28,7 +28,10 @@ def main():
 # validate that entry, and add validated entry to the game board.
 def turn_controller():
     while True:
-        add_to_game_board(number_validation(new_turn()))
+        validated_entry = move_validation(number_validation(new_turn()))
+        while validated_entry is False:
+            validated_entry = move_validation(number_validation(new_turn()))
+        add_to_game_board(validated_entry)
         print_board()
         if is_win_condition():
             return is_win_condition()
@@ -68,27 +71,58 @@ def new_turn():
 
 
 # Function is used to validate the parameter for datatype, allowed range, and if the selected number has not been used
+# def number_validation(selection):
+#     global turn_count
+#     pattern = re.compile(r'\b[1-9]\b')
+#     mo = pattern.search(str(selection))
+#     # loop will continue if no match was found from .search(), or if selection when used as a key in game_square_dict
+#     # returns a non-numeric value
+#     while mo is None or str(game_square_dict[int(selection)]).isnumeric() is False:
+#         if turn == "Player":
+#             selection = input("Not allowed. Please choose an unoccupied square: ")
+#             mo = pattern.search(selection)
+#         else:
+#             selection = random.randint(1,9)
+#     number_fixed = int(selection)
+#     # if conditions are satisfied, turn counter is advanced by 1 and the turn variable switches to the other player
+#     # and the users selected number is returned to the turn_controller() to be added to the game board.
+#     if turn == 'Player':
+#         turn_count += 1
+#         return number_fixed
+#     elif turn == 'Computer':
+#         turn_count += 1
+#         return number_fixed
+
+# regular expression is used to ensure that the only allowed entry is numeric between 1-9.
+# if no pattern is found the user is asked to submit a new entry until a match is found.
+# When match condition is met the value is returned to turn_controller.
 def number_validation(selection):
-    global turn_count
     pattern = re.compile(r'\b[1-9]\b')
     mo = pattern.search(str(selection))
-    # loop will continue if no match was found from .search(), or if selection when used as a key in game_square_dict
-    # returns a non-numeric value
-    while mo is None or str(game_square_dict[int(selection)]).isnumeric() is False:
-        if turn == "Player":
-            selection = input("Not allowed. Please choose an unoccupied square: ")
-            mo = pattern.search(selection)
-        else:
-            selection = random.randint(1,9)
-    number_fixed = int(selection)
-    # if conditions are satisfied, turn counter is advanced by 1 and the turn variable switches to the other player
-    # and the users selected number is returned to the turn_controller() to be added to the game board.
-    if turn == 'Player':
-        turn_count += 1
-        return number_fixed
-    elif turn == 'Computer':
-        turn_count += 1
-        return number_fixed
+    while mo is None:
+        selection = input("Please enter a single number 1-9 with no spaces: ")
+        mo = pattern.search(selection)
+    return int(selection)
+
+
+# parameter is used as the key to access the value of the game_square_dict. The value is then evaluated by the
+# .isnumeric() method. Should the method return False, the boolean is returned to the turn controller. Else validated
+# value is returned.
+def move_validation(choice):
+    global turn
+    global turn_count
+    if str(game_square_dict[int(choice)]).isnumeric() is False:
+        if turn == 'Player':
+            return False
+        elif turn == 'Computer':
+            return False
+    else:
+        if turn == 'Player':
+            turn_count += 1
+            return choice
+        elif turn == 'Computer':
+            turn_count += 1
+            return choice
 
 
 # entry parameter is used as the key to access an item in the game_square_dict dictionary. Dependant on value of turn,
@@ -138,23 +172,27 @@ def winner(game_win):
         print('It\'s a Draw!')
 
 
-# User is asked to enter 'y' to play again. If condition is met a for loop is used to reset the game_square_dict to its
-# original values and the counter is set back to 0 before the turn_controller is called to keep playing with the winner
-# of the previous game starting. If n is entered a final message is printed and the program closes.
+# user input is validated after entering y or n to restart or close the program, respectively. A boolean value is
+# returned based on input
 def restart():
-    global turn_count
     again = input("Would you like to try again? Enter 'y' or 'n': ")
     while again.lower() != 'y' and again.lower() != 'n':
         again = input("Would you like to try again? Enter 'y' or 'n': ")
     if again == 'y':
-        print()
-        for i in range(len(game_square_dict)):
-            game_square_dict[i + 1] = i + 1
-        turn_count = 0
         return True
     else:
         print('Thanks for playing!')
         return False
+
+
+# function is used to reset the game board by using a loop to reassign dictionary value back to integers 1-9.
+# turn counter is reset to 0
+def clear_board():
+    global turn_count
+    print()
+    for i in range(len(game_square_dict)):
+        game_square_dict[i + 1] = i + 1
+    turn_count = 0
 
 
 main()
