@@ -128,7 +128,7 @@ def is_win_condition():
             (game_square_dict[1] == box and game_square_dict[5] == box and game_square_dict[9] == box) or \
             (game_square_dict[3] == box and game_square_dict[5] == box and game_square_dict[7] == box):
         return True
-    elif turn_count == 9:
+    elif turn_count >= 8:
         return False
     # if no previous conditions are met, turn will be assigned a opposite of previous user and will be sent back to the
     # turn controller for the next round.
