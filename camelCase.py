@@ -1,22 +1,45 @@
-'''
-Thomas Mullins
-8/25/2020
-Description: Program will ask the user to enter a sentence, and then return that sentence in camel case
-'''
 
 import re
 pattern = re.compile(r'\W')
-sentence = input('Please enter a sentence. Any sentence at all: ')
-wordSplit = sentence.split(' ')
-variableName = ''
-for i in range(len(wordSplit)):
-    if i == 0:
-        variableName += wordSplit[i]
-        print(wordSplit[i].lower(), end='')
+
+
+def main():
+    display_banner()
+    sentence = get_input()
+    outputs = camelCase_convert(sentence)
+    print_results(outputs)
+
+
+def display_banner():
+    '''Display program name in banner'''
+    msg = 'AWESOME camelCaseGenerator PROGRAM'
+    stars = '*' * len(msg)
+    print(f'\n {stars} \n {msg} \n {stars}\n')
+
+
+def get_input():
+    new_variable = input('Please enter a sentence to convert: ')
+    return new_variable
+
+
+def camelCase_convert(sentence):
+    word_split = sentence.split(' ').strip()
+    variable_name = ''
+    for i in range(len(word_split)):
+        if i == 0:
+            variable_name += word_split[i].lower()
+        else:
+            variable_name += word_split[i].capitalize()
+    mo = pattern.search(variable_name)
+    if mo is not None:
+        return f'\nWarning: There may be an issue in created variable name "{variable_name}"'
     else:
-        variableName += wordSplit[i]
-        print(wordSplit[i].capitalize(), end='')
-mo = pattern.search(variableName)
-if mo is not None:
-    print(f'\nWarning: There may be an issue in created variable name "{variableName}"')
+        return variable_name
+
+
+def print_results(converted_var):
+    print(converted_var)
+
+
+main()
 
